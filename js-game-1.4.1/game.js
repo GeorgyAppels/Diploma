@@ -123,7 +123,12 @@ function isActor(actor) {
   return (actor instanceof Actor) ? true : false;
 }
 
-
+const grid = [
+  new Array(3),
+  ['wall', 'wall', 'lava']
+];
+const level = new Level(grid);
+runLevel(level, DOMDisplay);
 
 /*
 let dictionary = new Map();
