@@ -2,7 +2,7 @@
 
 class Vector {
   constructor (x = 0, y = 0) {
-    this.x = x;
+    this.x = x+5;
     this.y = y;
   }
   plus(addVector) {
