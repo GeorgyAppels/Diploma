@@ -2,27 +2,34 @@
 
 class Vector {
   constructor (x = 0, y = 0) {
-    this.x = x+5;
+    this.x = x;
     this.y = y;
   }
   plus(addVector) {
     if (!isVector(addVector)) {
-      console.log('Можно прибавлять к вектору только вектор типа Vector');
+      throw new Error('РњРѕР¶РЅРѕ РїСЂРёР±Р°РІР»СЏС‚СЊ Рє РІРµРєС‚РѕСЂСѓ С‚РѕР»СЊРєРѕ РІРµРєС‚РѕСЂ С‚РёРїР° Vector');
     }
     return new Vector(this.x + addVector.x, this.y + addVector.y);
   }
   times(multiplier) {
-    return new Vector(this.x * multiplier, this.y * multiplier);  
+    return new Vector(this.x * multiplier, this.y * multiplier);
   }
 }
 
 class Actor {
   constructor (pos = new Vector(0,0), size = new Vector(1,1), speed = new Vector(0,0)) {
-    if ((isVector(pos)) && (isVector(size)) && (isVector(speed))) {
+    if ((!isVector(pos)) || (!isVector(size)) || (!isVector(speed))) {
+      throw new Error ('РџРѕР·РёС†РёСЏ, СЂР°Р·РјРµСЂ Рё СЃРєРѕСЂРѕСЃС‚СЊ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РѕР±СЉРµРєС‚Р°РјРё Vector');
+    } else {
       this.pos = pos;
       this.size = size;
       this.speed = speed;
-      this.type = 'actor';
+      Object.defineProperty(this, 'type', {
+        value: 'actor',
+        writable: false,
+        enumerable: false,
+        configurable: false
+      });
     }
   }
   get left() {
@@ -36,17 +43,17 @@ class Actor {
   }
   get bottom() {
     return this.pos.y + this.size.x;
-  }  
+  }
   act() {}
   isIntersect(actor) {
     if (!isActor(actor)) {
-      console.log('Можно сравнивать с движущимся объектом только объект типа Actor');
+      throw new Error('РђСЂРіСѓРјРµРЅС‚РѕРј С„СѓРЅРєС†РёРё isIntersect РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РѕР±СЉРµРєС‚ Actor');
     } else {
       if (this === actor) {
         return false;
       } else {
         return ((this.left < actor.right) && (actor.left < this.right) && (this.bottom > actor.top) && (actor.bottom > this.top));
-      }   
+      }
     }
   }
 }
@@ -55,9 +62,9 @@ class Level  {
   constructor(grid, actors) {
     this.grid = grid;
     this.actors = actors;
-    this.player;
-    this.height = grid.length;
-    this.width = grid[0].length; //исправить
+    this.player = findPlayer(actors);
+    this.height = (grid === undefined) ? 0 : grid.length;
+    this.width = widthOfGrid(grid);
     this.status = null;
     this.finishDelay = 1;
   }
@@ -66,7 +73,7 @@ class Level  {
   }
   actorAt(actor) {
     if ((!isActor(actor)) || (actor === undefined)) {
-      console.log('В actorAt можно передавать только объект типа Actor');
+      console.log('пїЅ actorAt пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ Actor');
     }
     let intActor;
     this.actors.forEach(function(item) {
@@ -74,11 +81,11 @@ class Level  {
         intActor = item;
       }
     });
-    return intActor; 
+    return intActor;
   }
   obstacleAt(pos, size) {
     if ((!isVector(pos)) || (!isVector(size))) {
-      console.log('В obstacleAt можно передавать только объекты типа Vector');
+      console.log('пїЅ obstacleAt пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ Vector');
     }
     let actor = new Actor(pos, size);
     if (this.width < actor.right) {
@@ -86,8 +93,8 @@ class Level  {
     }
     if  (actor.height > this.bottom) {
       return 'lava';
-    }  
-    return this.grid[actor.pos.y][actor.pos.x]; //надо проверить всю область, которую занимает объект, а не только начальную его координату
+    }
+    return this.grid[actor.pos.y][actor.pos.x]; //пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
   }
   removeActor(actor) {
     this.actors.splice(this.actors.indexOf(actor), 1);
@@ -115,6 +122,15 @@ class Level  {
   }
 }
 
+const grid = [
+  new Array(3),
+  ['wall', 'wall', 'lava', 'rrrr']
+];
+const level = new Level(grid, []);
+console.log(level.width);
+
+
+// Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё РґР»СЏ СЂРµР°Р»РёР·Р°С†РёРё РєР»Р°СЃСЃРѕРІ
 function isVector(vector) {
   return (vector instanceof Vector) ? true : false;
 }
@@ -123,12 +139,34 @@ function isActor(actor) {
   return (actor instanceof Actor) ? true : false;
 }
 
-const grid = [
-  new Array(3),
-  ['wall', 'wall', 'lava']
-];
-const level = new Level(grid);
-runLevel(level, DOMDisplay);
+//РґР»СЏ width РІ РєР»Р°СЃСЃРµ Level
+function widthOfGrid(grid) {
+  if (grid === undefined) {
+    return 0;
+  }
+  let maxLength = 0;
+  grid.forEach(function(string) {
+    if (string.length > maxLength) {
+      maxLength = string.length;
+    }
+  });
+  return maxLength;
+}
+
+//РґР»СЏ player РІ РєР»Р°СЃСЃРµ Level
+function findPlayer(actors) {
+  let player;// = new Actor();
+  /*Object.defineProperty(player, 'type', {
+    value: 'player',
+    writable: false,
+    enumerable: false,
+    configurable: false
+  });*/
+  //if (actors !== undefined) {
+//    player = actors.find()
+//  }
+  return player;
+}
 
 /*
 let dictionary = new Map();
