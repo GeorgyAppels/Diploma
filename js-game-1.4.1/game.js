@@ -47,7 +47,7 @@ class Actor {
   act() {}
   isIntersect(actor) {
     if (!isActor(actor)) {
-      throw new Error('Аргументом функции isIntersect должен быть объект Actor');
+      throw new Error('Аргументом метода isIntersect должен быть объект Actor');
     } else {
       if (this === actor) {
         return false;
@@ -73,7 +73,10 @@ class Level  {
   }
   actorAt(actor) {
     if ((!isActor(actor)) || (actor === undefined)) {
-      console.log('� actorAt ����� ���������� ������ ������ ���� Actor');
+      throw new Error('Аргументом метода actorAt должен быть объект Actor');
+    }
+    if (this.height === 0) {
+      return undefined;
     }
     let intActor;
     this.actors.forEach(function(item) {
@@ -155,16 +158,12 @@ function widthOfGrid(grid) {
 
 //для player в классе Level
 function findPlayer(actors) {
-  let player;// = new Actor();
-  /*Object.defineProperty(player, 'type', {
-    value: 'player',
-    writable: false,
-    enumerable: false,
-    configurable: false
-  });*/
-  //if (actors !== undefined) {
-//    player = actors.find()
-//  }
+  let player;
+  if (actors !== undefined) {
+    player = actors.find(function(actor) {
+      return actor.type === 'player';
+    });
+  }
   return player;
 }
 
