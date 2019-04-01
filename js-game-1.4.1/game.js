@@ -75,7 +75,7 @@ class Level  {
     if ((!isActor(actor)) || (actor === undefined)) {
       throw new Error('Аргументом метода actorAt должен быть объект Actor');
     }
-    if (this.height === 0) {
+    if ((this.grid === undefined) && (this.actors === undefined)) {
       return undefined;
     }
     let intActor;
@@ -125,12 +125,12 @@ class Level  {
   }
 }
 
-const grid = [
-  new Array(3),
-  ['wall', 'wall', 'lava', 'rrrr']
-];
-const level = new Level(grid, []);
-console.log(level.width);
+let player = new Actor();
+let mushroom = new Actor();
+const level = new Level(undefined, [ player, mushroom ]);
+const actor = level.actorAt(player);
+
+
 
 
 // Вспомогательные функции для реализации классов
