@@ -42,7 +42,7 @@ class Actor {
     return this.pos.y;
   }
   get bottom() {
-    return this.pos.y + this.size.x;
+    return this.pos.y + this.size.y;
   }
   act() {}
   isIntersect(actor) {
@@ -88,16 +88,16 @@ class Level  {
   }
   obstacleAt(pos, size) {
     if ((!isVector(pos)) || (!isVector(size))) {
-      console.log('� obstacleAt ����� ���������� ������ ������� ���� Vector');
+      throw new Error('Аргументами метода obstacleAt должны быть Vector');
     }
     let actor = new Actor(pos, size);
-    if (this.width < actor.right) {
+    if ((actor.left < 0) || (actor.right + 1 > this.width) || (actor.top < 0)) {
       return 'wall';
     }
-    if  (actor.height > this.bottom) {
+    if  (actor.bottom + 1 > this.height) {
       return 'lava';
     }
-    return this.grid[actor.pos.y][actor.pos.x]; //���� ��������� ��� �������, ������� �������� ������, � �� ������ ��������� ��� ����������
+    return this.grid[actor.pos.y][actor.pos.x];
   }
   removeActor(actor) {
     this.actors.splice(this.actors.indexOf(actor), 1);
@@ -158,10 +158,9 @@ function widthOfGrid(grid) {
 
 //для player в классе Level
 function findPlayer(actors) {
-  let player;
   if (actors !== undefined) {
-    player = actors.find(function(actor) {
-      return actor.type === 'player';
+    let player = actors.find(function(actor) {
+      return (actor.type === 'actor');
     });
   }
   return player;
