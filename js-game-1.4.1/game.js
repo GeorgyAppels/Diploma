@@ -24,12 +24,12 @@ class Actor {
       this.pos = pos;
       this.size = size;
       this.speed = speed;
-      Object.defineProperty(this, 'type', {
+/*      Object.defineProperty(this, 'type', {
         value: 'actor',
         writable: false,
         enumerable: false,
         configurable: false
-      });
+      });*/
     }
   }
   get left() {
@@ -43,6 +43,9 @@ class Actor {
   }
   get bottom() {
     return this.pos.y + this.size.y;
+  }
+  get type() {
+    return 'actor';
   }
   act() {}
   isIntersect(actor) {
@@ -129,12 +132,22 @@ class Level  {
         this.status = 'lost';
       } else if (obstacle === 'coin') {
         this.removeActor(actor);
-      } else if (this.noMoreActors('coin')) {
+        if (this.noMoreActors('coin')) {
           this.status = 'won';
+        }
       }
     }
   }
 }
+
+class Player{};
+
+const grid = [
+new Array(3),
+['wall', 'wall', 'lava']
+];
+const level = new Level(grid);
+runLevel(level, DOMDisplay);
 
 
 // Вспомогательные функции для реализации классов
