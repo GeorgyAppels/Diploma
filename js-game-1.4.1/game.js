@@ -24,12 +24,6 @@ class Actor {
       this.pos = pos;
       this.size = size;
       this.speed = speed;
-/*      Object.defineProperty(this, 'type', {
-        value: 'actor',
-        writable: false,
-        enumerable: false,
-        configurable: false
-      });*/
     }
   }
   get left() {
@@ -141,6 +135,7 @@ class Level  {
 }
 
 class Player{};
+
 
 const grid = [
 new Array(3),
