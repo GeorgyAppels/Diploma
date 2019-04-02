@@ -97,12 +97,24 @@ class Level  {
     if  (actor.bottom + 1 > this.height) {
       return 'lava';
     }
-    return this.grid[actor.pos.y][actor.pos.x];
+    // вложенные for'ы, наверное, не самое удачное решение...
+    let obstacle;
+    for (var i = Math.floor(actor.top); i < Math.ceil(actor.bottom); i++) {
+      for (var j = Math.floor(actor.left); j < Math.ceil(actor.right); j++) {
+        if ((this.grid[i][j] === 'wall') || (this.grid[i][j] === 'lava')) {
+          obstacle = this.grid[i][j];
+        }
+      }
+    }
+    return obstacle;
   }
   removeActor(actor) {
     this.actors.splice(this.actors.indexOf(actor), 1);
   }
   noMoreActors(actorType) {
+    if (this.actors === undefined) {
+      return true;
+    }
     let nMA = true;
     for(let actor of this.actors) {
       if (actor.type === actorType) {
@@ -117,20 +129,12 @@ class Level  {
         this.status = 'lost';
       } else if (obstacle === 'coin') {
         this.removeActor(actor);
-      }
-      if (this.noMoreActors('coin')) {
-        this.status = 'won';
+      } else if (this.noMoreActors('coin')) {
+          this.status = 'won';
       }
     }
   }
 }
-
-let player = new Actor();
-let mushroom = new Actor();
-const level = new Level(undefined, [ player, mushroom ]);
-const actor = level.actorAt(player);
-
-
 
 
 // Вспомогательные функции для реализации классов
@@ -158,9 +162,10 @@ function widthOfGrid(grid) {
 
 //для player в классе Level
 function findPlayer(actors) {
+  let player;
   if (actors !== undefined) {
-    let player = actors.find(function(actor) {
-      return (actor.type === 'actor');
+    player = actors.find(function(actor) {
+      return (actor.type === 'player');
     });
   }
   return player;
