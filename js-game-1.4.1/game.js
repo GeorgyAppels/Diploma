@@ -134,16 +134,77 @@ class Level  {
   }
 }
 
-class Player{};
+class LevelParser {
+  constructor(actorsDict) {
+    this.actorsDict = actorsDict;
+  }
+  actorFromSymbol(token) {
+    if ((typeof(token) !== 'string') || !(token in this.actorsDict)) {
+      return undefined;
+    }
+    return this.actorsDict[token];
+  }
+  obstacleFromSymbol(token) {
+    if (token === 'x') {
+      return 'wall';
+    } else if (token === '!') {
+      return 'lava';
+    }
+  }
+  createGrid(plan) {
+    let gridArray = [];
+    for (let str of plan) {
+      let stringArray = [];
+      for (let i = 0; i < str.length; i++) {
+        stringArray.push(this.obstacleFromSymbol(str.charAt(i)));
+      }
+      gridArray.push(stringArray);
+    }
+    return gridArray;
+  }
+  createActors(plan) {
+    if (this.actorsDict === undefined) {
+      return [];
+    }
+    let actorsArray = [];
+    for (let i = 0; i < plan.length; i++) {
+      for (let j = 0; j < plan[i].length; j++) {
+        let actor = this.actorFromSymbol(plan[i].charAt(j));
+        if ((actor !== undefined) && ((actor.__proto__ === Actor) || (actor === Actor))) {
+          actorsArray.push(new actor(new Vector(j, i)));
+        }
+      }
+    }
+    return actorsArray;
+  }
+  parse(plan) {
+    return new Level(this.createGrid(plan), this.createActors(plan));
+  }
+}
 
 
-const grid = [
-new Array(3),
-['wall', 'wall', 'lava']
-];
-const level = new Level(grid);
-runLevel(level, DOMDisplay);
 
+class Fireball extends Actor {}
+
+//class HorizontalFireball extends Actor {}
+
+//class HorizontalFireball extends Actor {}
+
+class Coin extends Actor{};
+
+class Player extends Actor{};
+
+
+/*
+let dictionary = new Map();
+dictionary.set('x', 'wall');
+dictionary.set('!', 'lava');
+dictionary.set('@', 'player');
+dictionary.set('o', 'coin');
+dictionary.set('=', 'HorizontalFireball');
+dictionary.set('|', 'VerticalFirevall');
+dictionary.set('v', 'rain');
+*/
 
 // Вспомогательные функции для реализации классов
 function isVector(vector) {
@@ -178,32 +239,3 @@ function findPlayer(actors) {
   }
   return player;
 }
-
-/*
-let dictionary = new Map();
-dictionary.set('x', 'wall');
-dictionary.set('!', 'lava');
-dictionary.set('@', 'player');
-dictionary.set('o', 'coin');
-dictionary.set('=', 'HorizontalFireball');
-dictionary.set('|', 'VerticalFirevall');
-dictionary.set('v', 'rain');
-
-
-class LevelParser {
-  contructor(actorsDict) {
-    this.actorsDict = actorsDict;
-  }
-  actorFromSymbol(token) {
-    return actorsDict[token];
-  }
-  obstacleFromSymbol(token) {
-    if (token === 'x') {
-      return 'wall';
-    } else if (token === '!') {
-      return 'lava';
-    }
-  }
-  createGrid()
-}
-*/
