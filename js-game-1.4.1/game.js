@@ -264,11 +264,9 @@ class Coin extends Actor{
 
 class Player extends Actor{
   constructor(pos) {
-    super();
-    this.size = new Vector(0.8, 1.5);
-    this.speed = new Vector(0, 0);
-    this.pos = pos.plus(0, 0.5);
-    //this.pos = pos;
+    super(pos.plus(new Vector(0, -0.5), new Vector(0.8, 1.5), new Vector(0, 0) ));
+    //this.size = new Vector(0.8, 1.5);
+    //this.speed = new Vector(0, 0);
   }
   get type() {
     return 'player';
