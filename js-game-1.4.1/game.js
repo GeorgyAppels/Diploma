@@ -180,6 +180,9 @@ class LevelParser {
   parse(plan) {
     return new Level(this.createGrid(plan), this.createActors(plan));
   }
+}
+
+
 
 class Fireball extends Actor {
   constructor (pos = new Vector(0,0), speed = new Vector(0,0)) {
@@ -207,9 +210,30 @@ class Fireball extends Actor {
   }
 }
 
-//class HorizontalFireball extends Actor {}
+class HorizontalFireball extends Fireball {
+  constructor(pos) {
+    super(pos);
+    this.speed = new Vector(2, 0);
+  }
+}
 
-//class HorizontalFireball extends Actor {}
+class VerticalFireball extends Fireball {
+  constructor(pos) {
+    super(pos);
+    this.speed = new Vector(0, 2);
+  }
+}
+
+class FireRain extends Fireball {
+  constructor(pos) {
+    super(pos);
+    this.speed = new Vector(0, 3);
+    this.initialPos = pos;
+  }
+  handleObstacle() {
+    this.pos = this.initialPos;
+  }
+}
 
 class Coin extends Actor{};
 
