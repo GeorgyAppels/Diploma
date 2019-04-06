@@ -194,11 +194,10 @@ class Fireball extends Actor {
     return 'fireball';
   }
   getNextPosition(time = 1) {
-    return new Vector(this.pos.x + this.speed.x * time, this.pos.y + this.speed.y * time);
+    return this.pos.plus(this.speed.times(time));
   }
   handleObstacle() {
-    this.speed.x = -this.speed.x;
-    this.speed.y = -this.speed.y;
+    this.speed = this.speed.times(-1);
   }
   act(time, level) {
     let nextPos = this.getNextPosition(time);
@@ -235,9 +234,46 @@ class FireRain extends Fireball {
   }
 }
 
-class Coin extends Actor{};
+class Coin extends Actor{
+  constructor(pos) {
+    super();
+    this.size = new Vector(0.6, 0.6);
+    this.pos = pos;//.plus(new Vector(0.2, 0.1));
+    this.initialPos = pos;
+    this.springSpeed = 8;
+    this.springDist = 0.07;
+    this.spring = Math.random() * Math.PI * 2;
+  }
+  get type() {
+    return 'coin';
+  }
+  updateSpring(time = 1) {
+    this.spring = this.spring + this.springSpeed * time;
+  }
+  getSpringVector() {
+    return new Vector(0, this.springDist * Math.sin(this.spring));
+  }
+  getNextPosition(time = 1) {
+    this.updateSpring(time);
+    return this.initialPos.plus(this.getSpringVector());
+  }
+  act(time = 1) {
+    this.pos = this.getNextPosition(time);
+  }
+};
 
-class Player extends Actor{};
+class Player extends Actor{
+  constructor(pos) {
+    super();
+    this.size = new Vector(0.8, 1.5);
+    this.speed = new Vector(0, 0);
+    this.pos = pos.plus(0, 0.5);
+    //this.pos;
+  }
+  get type() {
+    return 'player';
+  }
+}
 
 
 /*
