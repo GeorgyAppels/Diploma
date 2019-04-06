@@ -180,11 +180,32 @@ class LevelParser {
   parse(plan) {
     return new Level(this.createGrid(plan), this.createActors(plan));
   }
+
+class Fireball extends Actor {
+  constructor (pos = new Vector(0,0), speed = new Vector(0,0)) {
+    super(pos);
+    this.speed = speed;
+    this.size = new Vector(1,1);
+  }
+  get type() {
+    return 'fireball';
+  }
+  getNextPosition(time = 1) {
+    return new Vector(this.pos.x + this.speed.x * time, this.pos.y + this.speed.y * time);
+  }
+  handleObstacle() {
+    this.speed.x = -this.speed.x;
+    this.speed.y = -this.speed.y;
+  }
+  act(time, level) {
+    let nextPos = this.getNextPosition(time);
+    if (level.obstacleAt(nextPos, this.size) === undefined) {
+      this.pos = nextPos;
+    } else {
+      this.handleObstacle();
+    }
+  }
 }
-
-
-
-class Fireball extends Actor {}
 
 //class HorizontalFireball extends Actor {}
 
