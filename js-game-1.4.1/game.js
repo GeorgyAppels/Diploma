@@ -88,10 +88,10 @@ class Level  {
       throw new Error('Аргументами метода obstacleAt должны быть Vector');
     }
     let actor = new Actor(pos, size);
-    if ((actor.left < 0) || (actor.right + 1 > this.width) || (actor.top < 0)) {
+    if ((actor.left < 0) || (actor.right > this.width) || (actor.top < 0)) {
       return 'wall';
     }
-    if  (actor.bottom + 1 > this.height) {
+    if  (actor.bottom > this.height) {
       return 'lava';
     }
     // вложенные for'ы, наверное, не самое удачное решение...
@@ -270,17 +270,37 @@ class Player extends Actor{
   }
 }
 
+const schemas = [
+  [
+    '         ',
+    '         ',
+    '    =    ',
+    '       o ',
+    '     !xxx',
+    ' @       ',
+    'xxx!     ',
+    '         '
+  ],
+  [
+    '      v  ',
+    '    v    ',
+    '  v      ',
+    '        o',
+    '        x',
+    '@   x    ',
+    'x        ',
+    '         '
+  ]
+];
+const actorDict = {
+  '@': Player,
+  'v': FireRain,
+  'o': Coin
+}
+const parser = new LevelParser(actorDict);
+runGame(schemas, parser, DOMDisplay)
+  .then(() => console.log('Вы выиграли приз!'));
 
-/*
-let dictionary = new Map();
-dictionary.set('x', 'wall');
-dictionary.set('!', 'lava');
-dictionary.set('@', 'player');
-dictionary.set('o', 'coin');
-dictionary.set('=', 'HorizontalFireball');
-dictionary.set('|', 'VerticalFirevall');
-dictionary.set('v', 'rain');
-*/
 
 // Вспомогательные функции для реализации классов
 function isVector(vector) {
