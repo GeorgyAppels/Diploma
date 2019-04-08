@@ -94,7 +94,6 @@ class Level  {
     if  (actor.bottom > this.height) {
       return 'lava';
     }
-    // вложенные for'ы, наверное, не самое удачное решение...
     let obstacle;
     for (var i = Math.floor(actor.top); i < Math.ceil(actor.bottom); i++) {
       for (var j = Math.floor(actor.left); j < Math.ceil(actor.right); j++) {
@@ -170,7 +169,7 @@ class LevelParser {
     for (let i = 0; i < plan.length; i++) {
       for (let j = 0; j < plan[i].length; j++) {
         let actor = this.actorFromSymbol(plan[i].charAt(j));
-        if ((actor !== undefined) && ((actor.__proto__ === Actor) || (actor === Actor))) {
+        if ((actor !== undefined) && ((actor.__proto__ === Actor) || (actor === Actor) || (actor.__proto__ === Fireball))) {
           actorsArray.push(new actor(new Vector(j, i)));
         }
       }
@@ -237,7 +236,6 @@ class FireRain extends Fireball {
 class Coin extends Actor{
   constructor(pos = new Vector()) {
     super(pos.plus(new Vector(0.2, 0.1)), new Vector(0.6, 0.6));
-  //  this.size = new Vector(0.6, 0.6);
     this.initialPos = this.pos;
     this.springSpeed = 8;
     this.springDist = 0.07;
@@ -270,37 +268,21 @@ class Player extends Actor{
   }
 }
 
-const schemas = [
-  [
-    '         ',
-    '         ',
-    '    =    ',
-    '       o ',
-    '     !xxx',
-    ' @       ',
-    'xxx!     ',
-    '         '
-  ],
-  [
-    '      v  ',
-    '    v    ',
-    '  v      ',
-    '        o',
-    '        x',
-    '@   x    ',
-    'x        ',
-    '         '
-  ]
-];
+//Словарь
 const actorDict = {
   '@': Player,
   'v': FireRain,
-  'o': Coin
+  'o': Coin,
+  '=': HorizontalFireball,
+  '|': VerticalFireball,
+  'v': FireRain
 }
-const parser = new LevelParser(actorDict);
-runGame(schemas, parser, DOMDisplay)
-  .then(() => console.log('Вы выиграли приз!'));
 
+//Запуск игры
+const parser = new LevelParser(actorDict);
+loadLevels()
+  .then((schemas) => runGame(JSON.parse(schemas), parser, DOMDisplay)
+      .then(() => console.log('Победа!')));
 
 // Вспомогательные функции для реализации классов
 function isVector(vector) {
