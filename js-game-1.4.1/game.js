@@ -20,11 +20,10 @@ class Actor {
   constructor (pos = new Vector(0,0), size = new Vector(1,1), speed = new Vector(0,0)) {
     if ((!isVector(pos)) || (!isVector(size)) || (!isVector(speed))) {
       throw new Error ('Позиция, размер и скорость должны быть объектами Vector');
-    } else {
-      this.pos = pos;
-      this.size = size;
-      this.speed = speed;
     }
+    this.pos = pos;
+    this.size = size;
+    this.speed = speed;
   }
   get left() {
     return this.pos.x;
@@ -45,12 +44,11 @@ class Actor {
   isIntersect(actor) {
     if (!isActor(actor)) {
       throw new Error('Аргументом метода isIntersect должен быть объект Actor');
+    }
+    if (this === actor) {
+      return false;
     } else {
-      if (this === actor) {
-        return false;
-      } else {
-        return ((this.left < actor.right) && (actor.left < this.right) && (this.bottom > actor.top) && (actor.bottom > this.top));
-      }
+      return ((this.left < actor.right) && (actor.left < this.right) && (this.bottom > actor.top) && (actor.bottom > this.top));
     }
   }
 }
@@ -58,12 +56,27 @@ class Actor {
 class Level  {
   constructor(grid, actors) {
     this.grid = grid;
-    this.actors = actors;
-    this.player = findPlayer(actors);
+    this.actors = (actors === undefined) ? [] : actors;
     this.height = (grid === undefined) ? 0 : grid.length;
-    this.width = widthOfGrid(grid);
     this.status = null;
     this.finishDelay = 1;
+  }
+  get player() {
+    return this.actors.find(function(actor) {
+      return (actor.type === 'player');
+    });
+  }
+  get width() {
+    if (this.grid === undefined) {
+      return 0;
+    }
+    let maxLength = 0;
+    this.grid.forEach(function(string) {
+      if (string.length > maxLength) {
+        maxLength = string.length;
+      }
+    });
+    return maxLength;
   }
   isFinished() {
     return ((this.status !== null) && (this.finishDelay < 0));
@@ -108,9 +121,6 @@ class Level  {
     this.actors.splice(this.actors.indexOf(actor), 1);
   }
   noMoreActors(actorType) {
-    if (this.actors === undefined) {
-      return true;
-    }
     let nMA = true;
     for(let actor of this.actors) {
       if (actor.type === actorType) {
@@ -185,9 +195,7 @@ class LevelParser {
 
 class Fireball extends Actor {
   constructor (pos = new Vector(0,0), speed = new Vector(0,0)) {
-    super(pos);
-    this.speed = speed;
-    this.size = new Vector(1,1);
+    super(pos, new Vector(1,1), speed);
   }
   get type() {
     return 'fireball';
@@ -209,23 +217,20 @@ class Fireball extends Actor {
 }
 
 class HorizontalFireball extends Fireball {
-  constructor(pos) {
-    super(pos);
-    this.speed = new Vector(2, 0);
+  constructor(pos, speed = new Vector(2, 0)) {
+    super(pos, speed);
   }
 }
 
 class VerticalFireball extends Fireball {
-  constructor(pos) {
-    super(pos);
-    this.speed = new Vector(0, 2);
+  constructor(pos, speed = new Vector(0, 2)) {
+    super(pos, speed);
   }
 }
 
 class FireRain extends Fireball {
-  constructor(pos) {
-    super(pos);
-    this.speed = new Vector(0, 3);
+  constructor(pos, speed = new Vector(0, 3)) {
+    super(pos, speed);
     this.initialPos = pos;
   }
   handleObstacle() {
@@ -271,7 +276,6 @@ class Player extends Actor{
 //Словарь
 const actorDict = {
   '@': Player,
-  'v': FireRain,
   'o': Coin,
   '=': HorizontalFireball,
   '|': VerticalFireball,
@@ -286,34 +290,9 @@ loadLevels()
 
 // Вспомогательные функции для реализации классов
 function isVector(vector) {
-  return (vector instanceof Vector) ? true : false;
+  return (vector instanceof Vector);
 }
 
 function isActor(actor) {
-  return (actor instanceof Actor) ? true : false;
-}
-
-//для width в классе Level
-function widthOfGrid(grid) {
-  if (grid === undefined) {
-    return 0;
-  }
-  let maxLength = 0;
-  grid.forEach(function(string) {
-    if (string.length > maxLength) {
-      maxLength = string.length;
-    }
-  });
-  return maxLength;
-}
-
-//для player в классе Level
-function findPlayer(actors) {
-  let player;
-  if (actors !== undefined) {
-    player = actors.find(function(actor) {
-      return (actor.type === 'player');
-    });
-  }
-  return player;
+  return (actor instanceof Actor);
 }
